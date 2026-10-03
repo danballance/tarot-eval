@@ -1,0 +1,432 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Tarot Reading API",
+    "version": "1.0.0"
+  },
+  "tags": [],
+  "paths": {
+    "/v1/readings": {
+      "post": {
+        "operationId": "readings-create",
+        "summary": "Create a new tarot Reading",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The generated Reading",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reading"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadingCreateRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/readings/user_id/{user_id}": {
+      "get": {
+        "operationId": "readings-list",
+        "summary": "List a User's Readings",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A collection of Readings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Reading"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/readings/user_id/{user_id}/id/{reading_id}": {
+      "delete": {
+        "operationId": "reading-delete",
+        "summary": "Delete a single User's Reading",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "reading_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reading Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The reading was deleted"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "operationId": "reading-read",
+        "summary": "Read a single User's Reading",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "reading_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Reading Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The fetched reading",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reading"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AgentResponse": {
+        "type": "object",
+        "required": [
+          "positionalResponses",
+          "summary"
+        ],
+        "properties": {
+          "positionalResponses": {
+            "$ref": "#/components/schemas/PositionalResponses"
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Summary"
+          }
+        },
+        "title": "AgentResponse"
+      },
+      "Card": {
+        "type": "object",
+        "required": [
+          "codeName",
+          "displayName",
+          "description",
+          "meaning",
+          "meaningSummary"
+        ],
+        "properties": {
+          "codeName": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Codename"
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Displayname"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Description"
+          },
+          "meaning": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Meaning"
+          },
+          "meaningSummary": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Meaningsummary"
+          }
+        },
+        "description": "Represents a single card from the reading.\n\nArgs:\ncode_name (str)   : Code name for card as seen in file system,\ni.e. 0_the_fool, ace_cups, 4_swords\ndisplay_name (str): Name to display via GUI, i.e.\nThe Fool, Ace of Cups, Four of Swords\ndescription (str) : Text description of the card's appearance.\nmeaning (str)     : The meaning of the card within the reading.\nmeaning_summary (str): A shorter summary of the card's meaning for quick readings.",
+        "title": "Card"
+      },
+      "DeckName": {
+        "type": "string",
+        "enum": [
+          "fantasy",
+          "modern-traditional",
+          "rainbow"
+        ],
+        "description": "The code name of a tarot deck.",
+        "title": "DeckName"
+      },
+      "Depth": {
+        "type": "string",
+        "enum": [
+          "quick",
+          "detailed"
+        ],
+        "description": "Enum representing the depth of a tarot reading.",
+        "title": "Depth"
+      },
+      "HTTPValidationError": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+          }
+        },
+        "title": "HTTPValidationError"
+      },
+      "PositionalResponses": {
+        "type": "object",
+        "required": [
+          "past",
+          "present",
+          "future"
+        ],
+        "properties": {
+          "past": {
+            "type": "string",
+            "title": "Past"
+          },
+          "present": {
+            "type": "string",
+            "title": "Present"
+          },
+          "future": {
+            "type": "string",
+            "title": "Future"
+          }
+        },
+        "title": "PositionalResponses"
+      },
+      "Reading": {
+        "type": "object",
+        "required": [
+          "userId",
+          "timestamp",
+          "depth",
+          "question",
+          "deckName",
+          "spread",
+          "agentResponse"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "userId": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Userid"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Timestamp"
+          },
+          "depth": {
+            "$ref": "#/components/schemas/Depth"
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Question"
+          },
+          "deckName": {
+            "$ref": "#/components/schemas/DeckName",
+            "title": "Deckname"
+          },
+          "spread": {
+            "$ref": "#/components/schemas/SpreadCompleted"
+          },
+          "agentResponse": {
+            "$ref": "#/components/schemas/AgentResponse"
+          }
+        },
+        "description": "Model for a generated tarot reading, including its persistent ID.\n\nArgs:\nid (str | None): The unique ID assigned by the persistence layer (e.g., Firestore document ID). Defaults to None.\nuser_id (str): The unique ID of the user who requested the reading (from Clerk).\ntimestamp (datetime): The timestamp when the reading was created.\ndepth (Depth): The depth of the reading.\nquestion (str): The question asked by the enquirer.\ndeck_name (DeckName): The code name of the deck used for the reading.\nspread (SpreadCompleted): The cards dealt in their positions.\nagent_response (AgentResponse): The LLM's structured interpretation.",
+        "title": "Reading"
+      },
+      "ReadingCreateRequest": {
+        "type": "object",
+        "required": [
+          "question",
+          "deckName"
+        ],
+        "properties": {
+          "depth": {
+            "$ref": "#/components/schemas/Depth",
+            "default": "detailed"
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Question"
+          },
+          "deckName": {
+            "$ref": "#/components/schemas/DeckName",
+            "title": "Deckname"
+          }
+        },
+        "description": "Request model for creating a tarot reading.\n\nArgs:\ndepth (Depth): The depth of the reading.\nquestion (str): The question asked by the enquirer.\ndeck_name (DeckName): The code name of the deck to use for the reading.",
+        "title": "ReadingRequest"
+      },
+      "SpreadCompleted": {
+        "type": "object",
+        "required": [
+          "past",
+          "present",
+          "future"
+        ],
+        "properties": {
+          "past": {
+            "$ref": "#/components/schemas/Card"
+          },
+          "present": {
+            "$ref": "#/components/schemas/Card"
+          },
+          "future": {
+            "$ref": "#/components/schemas/Card"
+          }
+        },
+        "unevaluatedProperties": {
+          "not": {}
+        },
+        "description": "A three-card spread after each position has been assigned a card.",
+        "title": "SpreadCompleted"
+      },
+      "ValidationError": {
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "properties": {
+          "loc": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "title": "ValidationError"
+      }
+    }
+  }
+}
